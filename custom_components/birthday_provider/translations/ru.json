@@ -1,0 +1,31 @@
+{
+  "title": "Birthday Provider",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Подключение Apple iCloud Contacts",
+        "description": "Используйте Аккаунт Apple и пароль для приложения.",
+        "data": {
+          "username": "Аккаунт Apple",
+          "password": "Пароль для приложения"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Повторное подключение Apple iCloud Contacts",
+        "description": "Введите новый пароль для приложения.",
+        "data": {
+          "password": "Пароль для приложения"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Не удалось подключиться к контактам iCloud.",
+      "invalid_auth": "Ошибка аутентификации. Проверьте Аккаунт Apple и пароль для приложения.",
+      "unknown": "Непредвиденная ошибка."
+    },
+    "abort": {
+      "already_configured": "Этот Аккаунт Apple уже настроен.",
+      "reauth_successful": "Повторная аутентификация выполнена."
+    }
+  }
+}

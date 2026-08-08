@@ -1,0 +1,39 @@
+name: Bug report
+description: Report a reproducible Birthday Provider problem
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not paste Apple credentials, raw vCards, or personal contact data.
+  - type: input
+    id: version
+    attributes:
+      label: Birthday Provider version
+    validations:
+      required: true
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Describe the behavior using synthetic names/dates where possible.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics
+      description: Attach Birthday Provider diagnostics if available. Do not attach exported contacts.

@@ -1,0 +1,31 @@
+{
+  "title": "Birthday Provider",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect Apple iCloud Contacts",
+        "description": "Use your Apple Account and an app-specific password.",
+        "data": {
+          "username": "Apple Account",
+          "password": "App-specific password"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Reconnect Apple iCloud Contacts",
+        "description": "Enter a new app-specific password.",
+        "data": {
+          "password": "App-specific password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to iCloud Contacts.",
+      "invalid_auth": "Authentication failed. Check the Apple Account and app-specific password.",
+      "unknown": "Unexpected error."
+    },
+    "abort": {
+      "already_configured": "This Apple account is already configured.",
+      "reauth_successful": "Reauthentication was successful."
+    }
+  }
+}
