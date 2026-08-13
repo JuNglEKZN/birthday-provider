@@ -39,8 +39,13 @@ Reference coverage:
 
 ### Active window
 
-Include `days_until`: 0, 1, 2, 3.  
-Exclude 4.
+Include events where:
+
+```text
+as_of <= event.date <= as_of + 3 calendar days
+```
+
+Exclude an occurrence on `as_of + 4 calendar days`.
 
 Boundaries:
 
@@ -89,7 +94,7 @@ Day 1 03:00 successful sync
 → snapshot loads
 → iCloud unavailable
 → active window still calculated
-→ 00:00 next day recalculates days_until
+→ 00:00 next day recalculates active events from occurrence dates
 → no remote data destruction
 ```
 
