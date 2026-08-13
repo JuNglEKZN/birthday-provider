@@ -228,9 +228,11 @@ ActiveBirthdayEvent:
     id: str
     name: str
     date: date
-    days_until: int
     age: int | None
 ```
+
+`ActiveBirthdayEvent` contains no relative-day field. Consumers that need an
+offset may derive `event.date - as_of` locally.
 
 ---
 
@@ -339,7 +341,6 @@ Examples:
 This exact policy applies to:
 
 - occurrence date
-- days_until
 - active-window inclusion
 - age
 
@@ -347,22 +348,13 @@ This exact policy applies to:
 
 ## 14. Active window
 
-Active events include occurrences for:
+An occurrence is active when:
 
 ```text
-reference date
-+1 calendar day
-+2 calendar days
-+3 calendar days
+as_of <= event.date <= as_of + 3 calendar days
 ```
 
-Thus:
-
-```text
-days_until ∈ [0, 3]
-```
-
-Day +4 is excluded.
+The event date is concrete; no relative-day field is stored or exposed.
 
 No cap exists on the number of birthday events on one date.
 
@@ -451,7 +443,7 @@ Do not persist:
 - phones
 - email addresses
 - addresses
-- active `days_until` values as the sole source of truth
+- a precomputed active-event list as the source of truth
 
 Use Home Assistant's Store helper.
 
@@ -640,7 +632,6 @@ events:
   - id: "synthetic-a"
     name: "Anna Petrova"
     date: "2026-08-08"
-    days_until: 0
     age: 42
 ```
 
@@ -915,7 +906,8 @@ A user can:
 9. handle multiple birthdays on one date
 10. handle February 29 under the March 1 policy
 11. restart HA and immediately use cached normalized data
-12. survive temporary iCloud outage without stale `days_until`
+12. survive temporary iCloud outage while recalculating active events locally
+    from the cached normalized catalog
 13. replace a revoked app-specific password through reauth
 14. download privacy-safe diagnostics
 15. remove the integration and its specialized snapshot

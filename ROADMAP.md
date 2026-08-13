@@ -143,7 +143,7 @@ successful remote sync
 → HA restart
 → iCloud unavailable
 → active data recalculated correctly
-→ next midnight changes days_until
+→ next midnight recalculates active events from their occurrence dates
 ```
 
 Prompt: `docs/codex/STAGE_4_SCHEDULING.md`

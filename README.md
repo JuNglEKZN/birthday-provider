@@ -103,14 +103,14 @@ events:
   - id: "synthetic-contact-a"
     name: "Anna Petrova"
     date: "2026-08-08"
-    days_until: 0
     age: 42
   - id: "synthetic-contact-b"
     name: "Sergey Ivanov"
     date: "2026-08-10"
-    days_until: 2
     age: null
 ```
+
+Consumers that need a relative offset may derive `event.date - as_of` locally.
 
 ## Scheduling
 
