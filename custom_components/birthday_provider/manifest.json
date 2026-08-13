@@ -1,12 +1,12 @@
 {
   "domain": "birthday_provider",
   "name": "Birthday Provider",
-  "version": "0.0.0",
-  "documentation": "https://github.com/JuNglEKZN/birthday-provider",
-  "issue_tracker": "https://github.com/JuNglEKZN/birthday-provider/issues",
   "codeowners": ["@JuNglEKZN"],
   "config_flow": true,
+  "documentation": "https://github.com/JuNglEKZN/birthday-provider",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "requirements": []
+  "issue_tracker": "https://github.com/JuNglEKZN/birthday-provider/issues",
+  "requirements": [],
+  "version": "0.0.0"
 }
