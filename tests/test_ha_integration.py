@@ -5,8 +5,11 @@ from __future__ import annotations
 import json
 
 import pytest
+from homeassistant.config_entries import ConfigEntryState
+from homeassistant.const import STATE_UNAVAILABLE
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.helpers import entity_registry as er
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -170,9 +173,29 @@ async def test_unload_and_removal_clean_up_entities_and_storage(
 
     assert await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
-    assert hass.states.get("sensor.birthday_provider") is None
-    assert hass.states.get("sensor.birthday_provider_last_sync") is None
+    assert entry.state is ConfigEntryState.NOT_LOADED
+
+    active_state = hass.states.get("sensor.birthday_provider")
+    assert active_state is not None
+    assert active_state.state == STATE_UNAVAILABLE
+    assert active_state.attributes["restored"] is True
+
+    entity_registry = er.async_get(hass)
+    assert [
+        entity
+        for entity in entity_registry.entities.values()
+        if entity.config_entry_id == entry.entry_id
+    ]
 
     await hass.config_entries.async_remove(entry.entry_id)
+    await hass.async_block_till_done()
 
+    assert hass.config_entries.async_get_entry(entry.entry_id) is None
     assert await BirthdayStore(hass, entry.entry_id).async_load() is None
+    assert not [
+        entity
+        for entity in entity_registry.entities.values()
+        if entity.config_entry_id == entry.entry_id
+    ]
+    assert hass.states.get("sensor.birthday_provider") is None
+    assert hass.states.get("sensor.birthday_provider_last_sync") is None
