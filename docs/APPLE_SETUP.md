@@ -31,3 +31,14 @@ If the primary Apple Account password is changed or reset, Apple may revoke app-
 ## Privacy
 
 Birthday Provider requests contacts from iCloud directly from the user's Home Assistant instance. There is no Birthday Provider relay server.
+
+## Privacy-safe manual smoke test
+
+Use a dedicated test Apple Account and an app-specific password. Create only
+synthetic Contacts for this test, with non-personal names and birthdays. Add
+the integration in Home Assistant, confirm the aggregated birthday sensor has
+the expected active events, then revoke the test app-specific password and
+confirm Home Assistant offers reauthentication. Do not attach CardDAV
+responses, logs containing HTTP payloads, or screenshots containing contacts
+to an issue. Delete the test integration and revoke the test password when the
+check is complete.

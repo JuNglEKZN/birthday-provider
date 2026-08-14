@@ -32,6 +32,14 @@ jobs:
           tests/test_core_models.py
           tests/test_core_occurrence.py
           tests/test_core_parsing.py
+      - name: CardDAV provider tests
+        env:
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"
+        run: >-
+          python -m pytest
+          -p pytest_asyncio.plugin
+          -o asyncio_mode=auto
+          tests/test_icloud_carddav.py
       - name: Home Assistant tests
         env:
           PYTEST_DISABLE_PLUGIN_AUTOLOAD: "1"

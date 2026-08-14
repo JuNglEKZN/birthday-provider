@@ -18,7 +18,11 @@ async def async_get_config_entry_diagnostics(
     coordinator = runtime_data.coordinator
     return {
         "integration_version": "0.0.0",
-        "provider_type": "fixture" if runtime_data.provider is not None else "none",
+        "provider_type": (
+            "fixture"
+            if type(runtime_data.provider).__name__ == "FixtureProvider"
+            else "icloud_carddav"
+        ),
         "normalized_birthday_count": len(coordinator.birthdays),
         "active_event_count": len(coordinator.active_events),
         "last_successful_sync": (

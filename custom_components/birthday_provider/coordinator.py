@@ -12,6 +12,7 @@ from homeassistant.util import dt as dt_util
 from .core.birthdays import active_birthday_events
 from .core.models import ActiveBirthdayEvent, Birthday
 from .core.normalization import normalize_contacts
+from .icloud import ICloudAuthenticationError, ICloudConnectionError
 from .storage import BirthdaySnapshot, BirthdayStore
 
 if TYPE_CHECKING:
@@ -28,11 +29,13 @@ class BirthdayProviderCoordinator:
         self,
         hass: HomeAssistant,
         storage: BirthdayStore,
-        provider: ContactProvider | None,
+        provider: ContactProvider,
+        on_authentication_error: Callable[[], None] | None = None,
     ) -> None:
         self.hass = hass
         self.storage = storage
         self.provider = provider
+        self._on_authentication_error = on_authentication_error
         self.birthdays: tuple[Birthday, ...] = ()
         self.active_events: tuple[ActiveBirthdayEvent, ...] = ()
         self.as_of: date = self._local_today()
@@ -41,31 +44,40 @@ class BirthdayProviderCoordinator:
         self._listeners: set[UpdateListener] = set()
 
     async def async_initialize(self) -> None:
-        """Restore the catalog, or use an injected synthetic fixture in tests."""
+        """Restore a catalog, or synchronously create the first snapshot."""
         snapshot = await self.storage.async_load()
         if snapshot is not None:
             self._apply_snapshot(snapshot)
             self.last_sync_status = "restored"
-        elif self.provider is not None:
-            await self.async_load_fixture()
         else:
-            self.async_recalculate_active_events()
+            await self.async_sync()
 
-    async def async_load_fixture(self) -> None:
-        """Normalize and store the complete synthetic fixture snapshot.
+    async def async_sync(self) -> None:
+        """Atomically replace the snapshot only after a complete provider fetch."""
+        try:
+            contacts = await self.provider.async_fetch_contacts()
+        except ICloudAuthenticationError:
+            self.last_sync_status = "authentication_failed"
+            self._notify_listeners()
+            if self._on_authentication_error is not None:
+                self._on_authentication_error()
+            raise
+        except ICloudConnectionError:
+            self.last_sync_status = "connection_failed"
+            self._notify_listeners()
+            raise
 
-        Stage 2 intentionally uses this only through the test fixture hook. It is
-        not a remote synchronization mechanism.
-        """
-        if self.provider is None:
-            return
-        contacts = await self.provider.async_fetch_contacts()
         result = normalize_contacts(contacts)
-        generated_at = dt_util.utcnow()
-        snapshot = BirthdaySnapshot(generated_at, result.birthdays)
+        snapshot = BirthdaySnapshot(dt_util.utcnow(), result.birthdays)
         await self.storage.async_save(snapshot)
         self._apply_snapshot(snapshot)
-        self.last_sync_status = "fixture_loaded"
+        self.last_sync_status = "success"
+
+    def async_set_authentication_error_handler(
+        self, handler: Callable[[], None]
+    ) -> None:
+        """Register the runtime reauth trigger after setup has succeeded."""
+        self._on_authentication_error = handler
 
     def async_recalculate_active_events(self) -> None:
         """Recalculate the derived active view without mutating stored birthdays."""
