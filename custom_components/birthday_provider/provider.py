@@ -1,11 +1,13 @@
-"""Stage 2 fixture-provider injection for Home Assistant tests."""
+"""Provider construction and the Stage 2 synthetic-provider test hook."""
 
 from __future__ import annotations
 
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .const import DATA_FIXTURE_PROVIDERS
+from .const import CONF_PASSWORD, CONF_USERNAME, DATA_FIXTURE_PROVIDERS
 from .core.provider import ContactProvider
+from .icloud import ICloudCardDAVProvider
 
 
 def async_set_fixture_provider(
@@ -32,3 +34,17 @@ def async_remove_fixture_provider(hass: HomeAssistant, entry_id: str) -> None:
     providers = hass.data.get(DATA_FIXTURE_PROVIDERS)
     if providers is not None:
         providers.pop(entry_id, None)
+
+
+def async_create_provider(
+    hass: HomeAssistant, entry_id: str, data: dict[str, str]
+) -> ContactProvider:
+    """Create the real CardDAV provider, or the explicitly injected test fixture."""
+    fixture_provider = async_get_fixture_provider(hass, entry_id)
+    if fixture_provider is not None:
+        return fixture_provider
+    return ICloudCardDAVProvider(
+        username=data[CONF_USERNAME],
+        app_specific_password=data[CONF_PASSWORD],
+        session=async_get_clientsession(hass),
+    )

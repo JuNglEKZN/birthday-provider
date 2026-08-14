@@ -22,7 +22,7 @@ class BirthdayProviderRuntimeData:
 
     coordinator: BirthdayProviderCoordinator
     storage: BirthdayStore
-    provider: ContactProvider | None
+    provider: ContactProvider
 
 
 async def async_setup_entry(
@@ -30,15 +30,30 @@ async def async_setup_entry(
 ) -> bool:
     """Set up Birthday Provider from a config entry."""
     from homeassistant.const import Platform
+    from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 
     from .coordinator import BirthdayProviderCoordinator
-    from .provider import async_get_fixture_provider
+    from .icloud import ICloudAuthenticationError, ICloudConnectionError
+    from .provider import async_create_provider
     from .storage import BirthdayStore
 
     storage = BirthdayStore(hass, entry.entry_id)
-    provider = async_get_fixture_provider(hass, entry.entry_id)
-    coordinator = BirthdayProviderCoordinator(hass, storage, provider)
-    await coordinator.async_initialize()
+    provider = async_create_provider(hass, entry.entry_id, entry.data)
+    coordinator = BirthdayProviderCoordinator(
+        hass,
+        storage,
+        provider,
+    )
+    try:
+        await coordinator.async_initialize()
+    except ICloudAuthenticationError as error:
+        raise ConfigEntryAuthFailed from error
+    except ICloudConnectionError as error:
+        raise ConfigEntryNotReady from error
+
+    coordinator.async_set_authentication_error_handler(
+        lambda: entry.async_start_reauth_if_available(hass)
+    )
 
     entry.runtime_data = BirthdayProviderRuntimeData(
         coordinator=coordinator,

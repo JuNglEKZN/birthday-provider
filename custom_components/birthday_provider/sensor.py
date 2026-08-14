@@ -108,6 +108,8 @@ class BirthdayProviderLastSyncSensor(_BirthdayProviderSensor):
     def extra_state_attributes(self) -> dict[str, str]:
         """Expose category-level status without personal data."""
         provider = (
-            "fixture" if self._entry.runtime_data.provider is not None else "none"
+            "fixture"
+            if type(self._entry.runtime_data.provider).__name__ == "FixtureProvider"
+            else "icloud_carddav"
         )
         return {"status": self._coordinator.last_sync_status, "provider": provider}
