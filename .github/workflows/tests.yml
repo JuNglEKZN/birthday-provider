@@ -19,7 +19,7 @@ jobs:
       - name: Install tooling
         run: >-
           python -m pip install --upgrade pip
-          pytest pytest-asyncio pytest-homeassistant-custom-component ruff
+          'pytest<9' pytest-asyncio pytest-homeassistant-custom-component ruff
           "homeassistant>=2026.8.0"
       - name: Ruff
         run: ruff check .
