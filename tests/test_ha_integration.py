@@ -10,10 +10,6 @@ from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.util import dt as dt_util
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.birthday_provider import (
-    async_remove_entry,
-    async_unload_entry,
-)
 from custom_components.birthday_provider.const import DOMAIN
 from custom_components.birthday_provider.core.models import Birthday, RawContact
 from custom_components.birthday_provider.core.provider import FixtureProvider
@@ -172,11 +168,11 @@ async def test_unload_and_removal_clean_up_entities_and_storage(
 ) -> None:
     entry = await _async_setup_fixture_entry(hass, FixtureProvider(()))
 
-    assert await async_unload_entry(hass, entry)
+    assert await hass.config_entries.async_unload(entry.entry_id)
     await hass.async_block_till_done()
     assert hass.states.get("sensor.birthday_provider") is None
     assert hass.states.get("sensor.birthday_provider_last_sync") is None
 
-    await async_remove_entry(hass, entry)
+    await hass.config_entries.async_remove(entry.entry_id)
 
     assert await BirthdayStore(hass, entry.entry_id).async_load() is None
