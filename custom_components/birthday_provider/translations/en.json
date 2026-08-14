@@ -27,5 +27,15 @@
       "already_configured": "This Apple account is already configured.",
       "reauth_successful": "Reauthentication was successful."
     }
+  },
+  "entity": {
+    "sensor": {
+      "active_birthdays": {
+        "name": "Active birthdays"
+      },
+      "last_sync": {
+        "name": "Last successful sync"
+      }
+    }
   }
 }

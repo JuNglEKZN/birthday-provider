@@ -27,5 +27,15 @@
       "already_configured": "Этот Аккаунт Apple уже настроен.",
       "reauth_successful": "Повторная аутентификация выполнена."
     }
+  },
+  "entity": {
+    "sensor": {
+      "active_birthdays": {
+        "name": "Ближайшие дни рождения"
+      },
+      "last_sync": {
+        "name": "Последняя успешная синхронизация"
+      }
+    }
   }
 }
