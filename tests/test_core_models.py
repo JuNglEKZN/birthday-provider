@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from datetime import date
 
 import pytest
@@ -40,12 +41,11 @@ def test_active_event_uses_concrete_date_not_days_until() -> None:
         _ = event.days_until
 
 
-@pytest.mark.asyncio
-async def test_fixture_provider_returns_a_fresh_synthetic_snapshot() -> None:
+def test_fixture_provider_returns_a_fresh_synthetic_snapshot() -> None:
     provider = FixtureProvider((RawContact("person-1", "Ada", date(1985, 12, 10)),))
 
-    first = await provider.async_fetch_contacts()
-    second = await provider.async_fetch_contacts()
+    first = asyncio.run(provider.async_fetch_contacts())
+    second = asyncio.run(provider.async_fetch_contacts())
 
     assert first == second
     assert first is not second

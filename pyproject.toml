@@ -4,6 +4,15 @@ version = "0.0.0"
 description = "Development tooling for the Birthday Provider Home Assistant custom integration"
 requires-python = ">=3.14"
 
+[project.optional-dependencies]
+test = [
+  "homeassistant>=2026.8.0",
+  "pytest>=9.0.0",
+  "pytest-asyncio>=1.0.0",
+  "pytest-homeassistant-custom-component>=0.13.0",
+  "ruff>=0.16.0",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
