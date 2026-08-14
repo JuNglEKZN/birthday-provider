@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 
+import pytest
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.util import dt as dt_util
@@ -21,6 +22,14 @@ from custom_components.birthday_provider.diagnostics import (
 )
 from custom_components.birthday_provider.provider import async_set_fixture_provider
 from custom_components.birthday_provider.storage import BirthdaySnapshot, BirthdayStore
+
+pytestmark = pytest.mark.usefixtures("enable_custom_integrations")
+
+
+def _local_today(hass: HomeAssistant):
+    time_zone = dt_util.get_time_zone(hass.config.time_zone)
+    assert time_zone is not None
+    return dt_util.now(time_zone).date()
 
 
 def _entry() -> MockConfigEntry:
@@ -47,7 +56,7 @@ async def _async_setup_fixture_entry(
 async def test_fixture_provider_exposes_only_active_aggregated_events(
     hass: HomeAssistant,
 ) -> None:
-    today = dt_util.now(hass.config.time_zone).date()
+    today = _local_today(hass)
     provider = FixtureProvider(
         (
             RawContact(
@@ -106,7 +115,7 @@ async def test_cached_snapshot_restores_without_a_fixture_provider(
 ) -> None:
     entry = _entry()
     entry.add_to_hass(hass)
-    today = dt_util.now(hass.config.time_zone).date()
+    today = _local_today(hass)
     snapshot = BirthdaySnapshot(
         generated_at=dt_util.utcnow(),
         birthdays=(
@@ -128,7 +137,7 @@ async def test_cached_snapshot_restores_without_a_fixture_provider(
 async def test_diagnostics_exclude_all_contact_and_credential_data(
     hass: HomeAssistant,
 ) -> None:
-    today = dt_util.now(hass.config.time_zone).date()
+    today = _local_today(hass)
     entry = await _async_setup_fixture_entry(
         hass,
         FixtureProvider(

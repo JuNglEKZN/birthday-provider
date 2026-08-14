@@ -25,10 +25,16 @@ class BirthdayStore:
     """Read and write a versioned minimal birthday catalog."""
 
     def __init__(self, hass: HomeAssistant, entry_id: str) -> None:
-        self._store = Store[dict[str, Any]](
-            hass,
+        self._hass = hass
+        self._key = f"{STORAGE_KEY_PREFIX}.{entry_id}"
+        self._store = self._new_store()
+
+    def _new_store(self) -> Store[dict[str, Any]]:
+        """Create a Store instance with no retained in-memory payload."""
+        return Store[dict[str, Any]](
+            self._hass,
             STORAGE_VERSION,
-            f"{STORAGE_KEY_PREFIX}.{entry_id}",
+            self._key,
         )
 
     async def async_load(self) -> BirthdaySnapshot | None:
@@ -62,3 +68,4 @@ class BirthdayStore:
     async def async_remove(self) -> None:
         """Remove the integration-specific snapshot for this config entry."""
         await self._store.async_remove()
+        self._store = self._new_store()

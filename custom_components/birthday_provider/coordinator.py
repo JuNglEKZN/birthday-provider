@@ -92,7 +92,10 @@ class BirthdayProviderCoordinator:
         self.async_recalculate_active_events()
 
     def _local_today(self) -> date:
-        return dt_util.now(self.hass.config.time_zone).date()
+        time_zone = dt_util.get_time_zone(self.hass.config.time_zone)
+        if time_zone is None:
+            return dt_util.now().date()
+        return dt_util.now(time_zone).date()
 
     def _notify_listeners(self) -> None:
         for listener in tuple(self._listeners):
